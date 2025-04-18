@@ -13,6 +13,7 @@ COPY . .
 
 # Build the app
 RUN npm run build
+RUN apt-get update && apt-get install -y bash
 
 # Production stage
 FROM nginx:alpine

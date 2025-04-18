@@ -1,25 +1,39 @@
+version: '3.9'
+
 services:
   backend:
     container_name: backend
     build: ./backend
     ports:
       - "8000:8000"
+    environment:
+      - PYTHONPATH=/app
+    volumes:
+      - ./backend:/app
     depends_on:
       - db
 
   db:
     container_name: db
     restart: always
-    image: postgres
+    image: postgres:15-alpine
     environment:
       POSTGRES_USER: user
       POSTGRES_PASSWORD: pass
       POSTGRES_DB: mydb
     ports:
       - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
 
   frontend:
     container_name: frontend
+    restart: always
     build: ./frontend
     ports:
-      - "3000:3000"
+      - "3000:80"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
