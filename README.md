@@ -1,2 +1,17 @@
-# newsdrop
-A FastAPI-based backend that anchors top headlines from around the world. Integrates with NewsAPI, secures access via OAuth2 client credentials, and delivers filtered news through clean, scalable APIs. Built with production readiness, testing, and Docker support in mind.
+# News Drop
+
+A FastAPI-based backend that anchors top headlines from around the world.
+
+## Features
+
+- Integration with NewsAPI
+- OAuth2 Client Credentials authentication
+- Save top news to a database
+- Filter headlines by country and source
+- Unit testing with pytest (80%+ coverage)
+- Dockerized setup for easy deployment
+- Clean, modular, and production-ready codebase
+
+---
+
+## Setup Instructions
