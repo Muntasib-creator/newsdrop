@@ -1,6 +1,7 @@
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException
 from app.models.news import NewsArticle, NewsResponse, DUMMY_NEWS
+from app.settings import settings
 
 router = APIRouter(prefix="/news", tags=["news"])
 
