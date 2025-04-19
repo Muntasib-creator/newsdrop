@@ -1,8 +1,10 @@
 from typing import Optional
-from fastapi import APIRouter, Query, HTTPException
-from app.models.news import NewsArticle, Response, DUMMY_NEWS, Articles
-# from app.settings import settings
+from fastapi import APIRouter, Query, HTTPException, Depends
+from app.models.news import NewsArticle as NewsArticleModel, Response, Articles
+from app.schema.news_articles import NewsArticle
 from app.services.newsapi import fetch_news, fetch_headlines
+from app.database import get_db
+from sqlalchemy.orm import Session
 import json
 
 router = APIRouter(prefix="/news", tags=["news"])
@@ -15,7 +17,7 @@ async def get_news(
     """Get all news with pagination support"""
     news_data = await fetch_news(page=page, pageSize=page_size)
     # print(json.dumps(news_data, indent=4))
-    articles = [NewsArticle(
+    articles = [NewsArticleModel(
         author=article["author"],
         title=article["title"],
         description=article["description"],
@@ -33,19 +35,28 @@ async def get_news(
         error=""
     )
 
-@router.post("/save-latest", response_model=list[NewsArticle])
-async def save_latest_news():
-    """Save the latest 3 news articles"""
-    # In a real implementation, this would save to a database
-    latest_news = DUMMY_NEWS[:3]
-    return latest_news
+@router.post("/save-latest", response_model=list[NewsArticleModel])
+async def save_latest_news(db: Session = Depends(get_db)):
+    """Save the latest 3 news articles to database"""
+    news_data = await fetch_news(page=1, pageSize=3)
+    saved_articles = NewsArticle.save_latest_articles(db, news_data["articles"])
+    return [NewsArticleModel(
+        author=article.author,
+        title=article.title,
+        description=article.description,
+        url=article.url,
+        url_to_image=article.url_to_image,
+        published_at=article.published_at.isoformat(),
+        source={"id": article.source_id, "name": article.source_name},
+        content=article.content
+    ) for article in saved_articles]
 
 @router.get("/headlines/country/{country_code}", response_model=Response)
 async def get_headlines_by_country(country_code: str):
     """Get top headlines by country"""
     headlines = await fetch_headlines(country=country_code)
     # print(json.dumps(headlines, indent=4))
-    articles = [NewsArticle(
+    articles = [NewsArticleModel(
         author=article["author"],
         title=article["title"],
         description=article["description"],
@@ -70,7 +81,7 @@ async def get_headlines_by_source(source_id: str):
     # print(json.dumps(headlines, indent=4))
     if 'error' in headlines:
         raise HTTPException(status_code=500, detail=headlines["error"])
-    articles = [NewsArticle(
+    articles = [NewsArticleModel(
         author=article["author"],
         title=article["title"],
         description=article["description"],
@@ -96,7 +107,7 @@ async def filter_headlines(
     """Get top headlines filtered by country and source"""
     headlines = await fetch_headlines(country=country)
     # print(json.dumps(headlines, indent=4))
-    articles = [NewsArticle(
+    articles = [NewsArticleModel(
         author=article["author"],
         title=article["title"],
         description=article["description"],
