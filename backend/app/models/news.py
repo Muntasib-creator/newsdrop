@@ -3,17 +3,19 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 class Source(BaseModel):
-    id: str
+    id: str | None
     name: str
 
 class NewsArticle(BaseModel):
-    author: str
-    title: str
-    description: str
-    url: str
-    url_to_image: str
-    published_at: str
     source: Source
+    author: str | None
+    title: str | None
+    description: str | None
+    url: str | None
+    url_to_image: str | None
+    published_at: str | None
+    content: str | None
+
 
 # Dummy data
 DUMMY_NEWS = [
@@ -25,6 +27,7 @@ DUMMY_NEWS = [
         url_to_image="https://example.com/tech-news/1",
         published_at=datetime.now().isoformat(),
         source=Source(id="tech-news", name="Tech News"),
+        content="This is a dummy content for the news article."
     ),
     NewsArticle(
         author="Jane Smith",
@@ -34,11 +37,14 @@ DUMMY_NEWS = [
         url_to_image="https://example.com/world-news/1",
         published_at=datetime.now().isoformat(),
         source=Source(id="world-news", name="World News"),
+        content="This is a dummy content for the news article."
     ),
 ]
 
-class NewsResponse(BaseModel):
+class Articles(BaseModel):
     articles: list[NewsArticle]
     total: int
-    page: int
-    pageSize: int 
+
+class Response(BaseModel):
+    data: Optional[Articles] = None
+    error: Optional[str] = None
