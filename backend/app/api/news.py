@@ -1,25 +1,34 @@
 from typing import Optional
 from fastapi import APIRouter, Query, HTTPException
 from app.models.news import NewsArticle, NewsResponse, DUMMY_NEWS
-from app.settings import settings
+# from app.settings import settings
+from app.services.newsapi import fetch_news
+import json
 
 router = APIRouter(prefix="/news", tags=["news"])
 
 @router.get("", response_model=NewsResponse)
 async def get_news(
     page: int = Query(1, ge=1),
-    size: int = Query(10, ge=1, le=100)
+    page_size: int = Query(10, ge=1, le=100)
 ):
     """Get all news with pagination support"""
-    start = (page - 1) * size
-    end = start + size
-    articles = DUMMY_NEWS[start:end]
-    
+    news_data = await fetch_news(page=page, pageSize=page_size)
+    print(json.dumps(news_data, indent=4))
+    articles = [NewsArticle(
+        author=article["author"],
+        title=article["title"],
+        description=article["description"],
+        url=article["url"],
+        url_to_image=article["urlToImage"],
+        published_at=article["publishedAt"],
+        source=article["source"]
+    ) for article in news_data["articles"]]
     return NewsResponse(
         articles=articles,
-        total=len(DUMMY_NEWS),
+        total=news_data["totalResults"],
         page=page,
-        size=size
+        pageSize=page_size
     )
 
 @router.post("/save-latest", response_model=list[NewsArticle])

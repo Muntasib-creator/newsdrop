@@ -26,5 +26,6 @@ ENV PYTHONPATH=/app
 
 EXPOSE 8000
 
+# For dev purpose comment out the following line
 CMD [ "uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
 # uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
