@@ -21,15 +21,6 @@ A FastAPI-based backend that anchors top headlines from around the world.
 - Docker and Docker Compose
 - A valid NewsAPI API key (get one at [newsapi.org](https://newsapi.org/register))
 
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-NEWS_API_KEY=your_api_key_here
-DATABASE_URL=postgresql://user:pass@db:5432/mydb
-```
-
 ### Running with Docker
 
 1. Clone the repository:
@@ -38,11 +29,17 @@ git clone https://github.com/Muntasib-creator/newsdrop.git
 cd newsdrop
 ```
 
-2. Create the `.env` file with your configuration (as shown above)
+2. Add the api-key in the root `.env` file
+
+```env
+NEWS_API_KEY=your_api_key_here
+DATABASE_URL=postgresql://user:pass@db:5432/mydb
+```
+
 
 3. Build and start the containers:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 4. The application will be available at:
