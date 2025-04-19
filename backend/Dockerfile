@@ -24,8 +24,14 @@ COPY . .
 # Add the current directory to Python path
 ENV PYTHONPATH=/app
 
+# Make the startup script executable
+RUN chmod +x ./start.sh
+
+# Expose the port
 EXPOSE 8000
 
+# Use the startup script
+CMD ["sh", "./start.sh"]
+
 # For dev purpose comment out the following line
-CMD [ "uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
-# uv run uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+# CMD [ "uv", "run", "uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
